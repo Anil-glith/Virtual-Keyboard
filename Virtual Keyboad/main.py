@@ -12,7 +12,7 @@ cap.set(4, 720)
 detector = HandDetector(detectionCon=0.8, maxHands=1)
 
 keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-        ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
         ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
         ["SPACE", "BACKSPACE", "CLEAR"]] 
 
@@ -74,22 +74,44 @@ def drawAll(img, buttonList):
     return img
 
 buttonList = []
+# Keyboard layout configuration
+keyboard_start_x = 100  # Starting X position for keyboard
+keyboard_start_y = 80   # Starting Y position for keyboard
+key_width = 85
+key_height = 85
+key_spacing = 10  # Space between keys
+row_spacing = 15  # Space between rows
+
 for i in range(len(keys)):
-    for j, key in enumerate(keys[i]):
+    row = keys[i]
+    # Calculate total width of the row
+    row_width = sum([key_width if key not in ["SPACE", "BACKSPACE", "CLEAR"] 
+                     else (300 if key == "SPACE" else 200) 
+                     for key in row]) + key_spacing * (len(row) - 1)
+    
+    # Center the row
+    start_x = keyboard_start_x + (1220 - keyboard_start_x - row_width) // 2
+    
+    current_x = start_x
+    pos_y = keyboard_start_y + i * (key_height + row_spacing)
+    
+    for j, key in enumerate(row):
         if key == "SPACE":
-            pos_x = 390
-            pos_y = 100 * i + 50
+            pos_x = current_x
+            buttonList.append(Button([pos_x, pos_y], key))
+            current_x += 300 + key_spacing
         elif key == "BACKSPACE":
-            pos_x = 700
-            pos_y = 100 * i + 50
+            pos_x = current_x
+            buttonList.append(Button([pos_x, pos_y], key))
+            current_x += 200 + key_spacing
         elif key == "CLEAR":
-            pos_x = 910
-            pos_y = 100 * i + 50
+            pos_x = current_x
+            buttonList.append(Button([pos_x, pos_y], key))
+            current_x += 200 + key_spacing
         else:
-            pos_x = 100 * j + 50
-            pos_y = 100 * i + 50
-        
-        buttonList.append(Button([pos_x, pos_y], key))
+            pos_x = current_x
+            buttonList.append(Button([pos_x, pos_y], key))
+            current_x += key_width + key_spacing
 
 while True:
     success, img = cap.read()
